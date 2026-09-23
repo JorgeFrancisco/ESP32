@@ -110,7 +110,7 @@ idf.py -p COM4 erase-flash
 idf.py -p COM4 flash
 
 # 8. Flash the factory data of this board (see "Factory data")
-python -m esptool --chip esp32c6 -p COM4 write_flash 0x3E0000 <uuid>-partition.bin
+python -m esptool --chip esp32c6 -p COM4 write_flash 0x2A000 <uuid>-partition.bin
 
 # 9. Open the serial monitor (exit with Ctrl+])
 idf.py -p COM4 monitor
@@ -152,14 +152,14 @@ New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name
 idf.py build
 idf.py -p <PORT> erase-flash
 idf.py -p <PORT> flash
-python -m esptool --chip esp32c6 -p <PORT> write_flash 0x3E0000 <uuid>-partition.bin
+python -m esptool --chip esp32c6 -p <PORT> write_flash 0x2A000 <uuid>-partition.bin
 idf.py -p <PORT> monitor
 ```
 
 ## Factory data (QR code, certificate and names)
 
 Each board has its own factory data, flashed to the `fctry` partition
-(`0x3E0000`, 24 KB): commissioning passcode and discriminator (the QR code),
+(`0x2A000`, 24 KB): commissioning passcode and discriminator (the QR code),
 device attestation certificate (DAC) and key, and the device information shown
 by the controllers (vendor name, product name, hardware version, VID/PID,
 serial number). It is generated with
@@ -267,7 +267,7 @@ default is `nvs`).
 
 ### 5. Flash and check
 
-Flash the firmware and `<uuid>-partition.bin` at `0x3E0000` (steps 6 to 8 of
+Flash the firmware and `<uuid>-partition.bin` at `0x2A000` (steps 6 to 8 of
 "Build and flash"). At boot the log shows the values read from the factory
 partition:
 
@@ -340,8 +340,11 @@ On Android, the Companion app commissions through Google Play Services, which
 keeps its own fabric (vendor ID `0x6006`, shown at boot as `Fabric index ...
 VendorId 0x6006`). Removing the device from Home Assistant then leaves that
 fabric behind and the device does not go back to commissioning mode: also
-remove it in **Android Settings > Google > Devices & sharing > Matter devices**,
-or hold BOOT for 10 s.
+remove it on the phone, in **Settings > Google services > All services > Matter
+devices**: switch to **This Android device**, tap the device and choose
+**Remove device** (in Portuguese: *Configurações > Serviços do Google > Todos os
+serviços > Dispositivos Matter > Este dispositivo Android > Remover
+dispositivo*). Or hold BOOT for 10 s.
 
 ## REST API
 
@@ -415,14 +418,18 @@ repository (ELF SHA256 `a0cfb4e80...`). The ESP32-H2 column is the baseline of
 | Item                                    | ESP32-C6                     | ESP32-H2                     |
 | --------------------------------------- | ---------------------------- | ---------------------------- |
 | Application image (`.bin`)              | 1,616,864 bytes (`0x18ABE0`) | 1,606,256 bytes (`0x188270`) |
-| Free in the 1,966,080-byte OTA slot     | 349,216 bytes (18 %)         | 359,824 bytes (18 %)         |
+| OTA slot (`ota_0`/`ota_1`, each)        | 4,194,304 bytes (`0x400000`) | 1,966,080 bytes (`0x1E0000`) |
+| Free in the OTA slot                    | 2,577,440 bytes (61 %)       | 359,824 bytes (18 %)         |
 | Code (`.text`) + constants (`.rodata`)  | 1,330,856 + 185,388 bytes    | 1,329,514 + 185,540 bytes    |
 | Bootloader                              | 20,576 bytes                 | 20,272 bytes                 |
 
-Both use the same 4 MB `partitions.csv` (two 1.875 MB OTA slots, 48 KB NVS,
-24 KB factory data); on the ESP32-C6 the other 12 MB are unused. No Wi-Fi
-library is linked: with `CONFIG_ENABLE_WIFI_STATION=n` only the BLE/802.15.4
-coexistence code of the ESP32-C6 is added.
+The ESP32-C6 uses its own 16 MB partition table (see "Partition table" below);
+the ESP32-H2 keeps a 4 MB layout (two 1.875 MB OTA slots, 48 KB NVS, 24 KB
+factory data). The image size does not depend on the table. The heap figures
+below were measured with the previous, H2-identical table; the partition
+layout does not change RAM usage. No Wi-Fi library is linked: with
+`CONFIG_ENABLE_WIFI_STATION=n` only the BLE/802.15.4 coexistence code of the
+ESP32-C6 is added.
 
 ### RAM
 
@@ -472,12 +479,57 @@ To repeat the measurement: `idf.py size`, `idf.py size-components`, the
 `heap_init` lines of the boot log and the `rest_api: HTTP server on port 80:
 free heap ...` line.
 
+## Partition table (16 MB)
+
+`partitions.csv` uses the whole 16 MB flash (`0x000000`-`0x1000000`, nothing
+left unallocated). `CONFIG_PARTITION_TABLE_OFFSET` stays `0xC000`.
+
+| Partition            | Type / subtype       | Offset     | Size                 | Use                                                     |
+| -------------------- | -------------------- | ---------- | -------------------- | ------------------------------------------------------- |
+| (bootloader)         |                      | `0x0`      | 48 KB (20 KB used)   | Second stage bootloader                                 |
+| (partition table)    |                      | `0xC000`   | 4 KB                 |                                                         |
+| `esp_secure_cert`    | `0x3F`               | `0xD000`   | 8 KB                 | Kept from the esp-matter layout (DAC comes from `fctry`) |
+| `phy_init`           | data / phy           | `0xF000`   | 4 KB                 | Kept for compatibility (PHY data is built in)           |
+| `nvs`                | data / nvs           | `0x10000`  | 92 KB (23 pages)     | Matter fabrics and KVS, OpenThread dataset, attributes  |
+| `nvs_keys`           | data / nvs_keys      | `0x27000`  | 4 KB                 | Only used with NVS encryption (disabled)                |
+| `otadata`            | data / ota           | `0x28000`  | 8 KB                 | Selects the OTA slot to boot                            |
+| `fctry`              | data / nvs           | `0x2A000`  | 24 KB                | Factory data (QR code, DAC, device info)                |
+| `ota_0`              | app / ota_0          | `0x30000`  | 4 MB                 | Firmware, slot A                                        |
+| `ota_1`              | app / ota_1          | `0x430000` | 4 MB                 | Firmware, slot B                                        |
+| `storage`            | data / littlefs      | `0x830000` | 7,936 KB (7.75 MB)   | Reserved for LittleFS (configuration, Web UI, logs)     |
+| `coredump`           | data / coredump      | `0xFF0000` | 64 KB                | Reserved for core dumps to flash                        |
+
+- **OTA slots:** the 1.62 MB image uses 39 % of each 4 MB slot. The ESP32-C6
+  MMU maps up to 16 MB of flash, so the slot size is not a limit.
+- **NVS:** with two fabrics (Google, Home Assistant) the 48 KB NVS of the
+  previous layout had 85 written and 87 erased entries of 1,296 (checked with
+  `nvs_tool.py`), and `CONFIG_MAX_FABRICS` is 5, so 48 KB was enough. It is
+  92 KB here to spread the frequent writes (for example `chip-counters`) over
+  more pages and leave room for future data; it fills the space up to the
+  first 64 KB-aligned app offset.
+- **`storage`:** declared as `littlefs` (subtype `0x83`) but not mounted yet.
+  LittleFS is preferred over SPIFFS (no directories, slow when full) and FAT
+  (more RAM, not power-loss safe); to use it, add the `joltwing/littlefs`
+  component and mount the `storage` label.
+- **`coredump`:** inactive while `CONFIG_ESP_COREDUMP_ENABLE_TO_NONE=y`. To
+  debug crashes, enable `CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH` and read the dump
+  with `idf.py coredump-info`.
+- The partition **labels** `nvs` (Matter and OpenThread storage) and `fctry`
+  (`CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL`) are unchanged, so no code or
+  configuration depends on the new offsets; only the factory data address
+  (`0x2A000`) does.
+- **Changing the table requires `erase-flash`:** it erases the fabrics, the
+  Thread network and the factory data. Flash the firmware, write the factory
+  partition at `0x2A000` and commission the device again (remove the old node
+  from the controllers first). The QR code and DAC do not change.
+
 ## Differences from the ESP32-H2 version
 
 | Item                  | ESP32-C6 (this repository)                           | ESP32-H2                         |
 | --------------------- | ---------------------------------------------------- | -------------------------------- |
 | Target                | `CONFIG_IDF_TARGET="esp32c6"`                        | `esp32h2`                        |
 | Flash                 | 16 MB (`CONFIG_ESPTOOLPY_FLASHSIZE_16MB`), Boya chip driver enabled | 4 MB             |
+| Partition table       | 16 MB: 4 MB OTA slots, 92 KB NVS, `fctry` at `0x2A000`, 7.75 MB LittleFS `storage`, 64 KB `coredump` | 4 MB: 1.875 MB OTA slots, 48 KB NVS, `fctry` at `0x3E0000` |
 | Radios                | Wi-Fi 6 (unused), BLE 5, IEEE 802.15.4               | BLE 5, IEEE 802.15.4             |
 | BLE and Thread        | Share the 2.4 GHz RF with software coexistence (`CONFIG_ESP_COEX_SW_COEXIST_ENABLE`, default) | Same |
 | Factory data          | Own QR code, passcode, discriminator and DAC (product name "ESP32-C6 Relay") | "ESP32-H2 Relay" |
@@ -551,7 +603,7 @@ Management, On/Off with the Lighting feature). Unused clusters are disabled in
 | `main/reset_button.c`  | BOOT button (factory reset)                                             |
 | `main/status_led.c`    | WS2812 status LED                                                       |
 | `sdkconfig.defaults`   | Target, Bluetooth LE, OpenThread, Matter, factory data providers, clusters |
-| `partitions.csv`       | 4 MB layout (of the 16 MB flash): two OTA slots, `fctry` factory data and secure cert partitions |
+| `partitions.csv`       | 16 MB layout: two 4 MB OTA slots, NVS, `fctry` factory data, LittleFS `storage`, `coredump` |
 
 ## Known warnings
 
@@ -560,8 +612,7 @@ Management, On/Off with the Lighting feature). Unused clusters are disabled in
   declared both in the `esp_matter` component and in the Matter SDK Kconfig
   shipped inside it. Harmless.
 - The first build compiles about 1900 files; later builds are incremental. The
-  application image is about 1.62 MB, 18% of the 1,966,080-byte OTA slots is
-  left.
+  application image is about 1.62 MB, 61% of the 4 MB OTA slots is left.
 - `ble_gap_terminate() failed: 48` / `Error CHIP:0x00000048 ... BLEManagerImpl.cpp`
   right after the device joins Thread during commissioning: the phone had
   already closed the BLE connection. Harmless.

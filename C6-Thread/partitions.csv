@@ -1,10 +1,15 @@
-# Name,   Type, SubType, Offset,  Size, Flags
-# Note: Firmware partition offset needs to be 64K aligned, initial 36K (9 sectors) are reserved for bootloader and partition table
-esp_secure_cert,  0x3F, ,0xd000,    0x2000, encrypted
-nvs,      data, nvs,     0x10000,   0xC000,
-nvs_keys, data, nvs_keys,,          0x1000, encrypted
-otadata,  data, ota,     ,          0x2000
-phy_init, data, phy,     ,          0x1000,
-ota_0,    app,  ota_0,   0x20000,   0x1E0000,
-ota_1,    app,  ota_1,   0x200000,  0x1E0000,
-fctry,    data, nvs,     0x3E0000,  0x6000
+# ESP32-C6, 16 MB flash (the ESP32-H2 version keeps its own 4 MB layout)
+# Name,          Type, SubType,   Offset,    Size,     Flags
+# Note: app partitions must be 64K aligned; 0x0-0xD000 holds the bootloader and the partition table (CONFIG_PARTITION_TABLE_OFFSET=0xC000)
+esp_secure_cert, 0x3F, ,          0xD000,    0x2000,   encrypted
+phy_init,        data, phy,       0xF000,    0x1000,
+nvs,             data, nvs,       0x10000,   0x17000,
+nvs_keys,        data, nvs_keys,  0x27000,   0x1000,   encrypted
+otadata,         data, ota,       0x28000,   0x2000,
+fctry,           data, nvs,       0x2A000,   0x6000,
+ota_0,           app,  ota_0,     0x30000,   0x400000,
+ota_1,           app,  ota_1,     0x430000,  0x400000,
+# Reserved for a future LittleFS (configuration, Web UI, logs); not mounted by the firmware yet
+storage,         data, littlefs,  0x830000,  0x7C0000,
+# Reserved for core dumps to flash (CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH, currently disabled)
+coredump,        data, coredump,  0xFF0000,  0x10000,

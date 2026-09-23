@@ -4,8 +4,8 @@
 CONFIG_IDF_TARGET="esp32c6"
 
 #
-# Flash: this ESP32-C6-DevKitC-1 (N16) has 16 MB. partitions.csv keeps the
-# same 4 MB layout as the ESP32-H2 version; the rest of the flash is unused.
+# Flash: this ESP32-C6-DevKitC-1 (N16) has 16 MB, fully allocated by
+# partitions.csv (4 MB OTA slots, LittleFS storage, core dump; see README).
 #
 CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
 # The N16 board used here has a Boya flash chip: use its driver instead of the
@@ -13,7 +13,7 @@ CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
 CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP=y
 
 #
-# Partition table: two OTA slots plus the Matter factory partitions
+# Partition table: two OTA slots, the Matter factory partitions, storage and core dump
 #
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
