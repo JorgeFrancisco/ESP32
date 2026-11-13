@@ -9,6 +9,7 @@ configuration.
 | [H2-Zigbee](H2-Zigbee) | ESP32-H2 | Zigbee 3.0 | On/Off Light (router) driving a relay, with BOOT pairing, an RGB status LED and `power_on_behavior` support. Tested with Zigbee2MQTT. |
 | [H2-Thread](H2-Thread) | ESP32-H2 | Matter over Thread | On/Off Plug-in Unit driving a relay, with a BOOT factory reset, an RGB status LED, per-board factory data and a read-only REST API. |
 | [C6-Thread](C6-Thread) | ESP32-C6 | Matter over Thread | Port of H2-Thread to the ESP32-C6 with a 16 MB partition table (4 MB OTA slots, LittleFS storage and core dump). |
+| [C6-Relay-X1](C6-Relay-X1) | ESP32-C6 | Matter over Thread | Port of C6-Thread to the ESP32-C6-Relay_X1 single relay board (ESP32-C6-WROOM-1, 4 MB flash, relay on GPIO19, single-color status LED). |
 
 All projects are built with ESP-IDF v5.5.5. The Matter projects use
 `espressif/esp_matter` 1.6 and the Zigbee project uses
