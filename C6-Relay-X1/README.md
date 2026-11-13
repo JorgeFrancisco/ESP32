@@ -41,7 +41,7 @@ flash), a 5 V **SRD-05VDC-SL-C** relay (NO/COM/NC, up to 10 A 250 VAC /
 
 | Function   | GPIO | Notes                                              |
 | ---------- | ---- | -------------------------------------------------- |
-| Status LED | 2    | On-board single-color LED, active high             |
+| Status LED | 2    | On-board red LED, active high                      |
 | BOOT       | 9    | On-board button, active low (also the boot key)    |
 | Relay      | 19   | Active high (`RELAY_ACTIVE_LEVEL`)                 |
 
@@ -306,7 +306,7 @@ then uses the standard test data (QR code `MT:Y.K9042C00KA0648G00`, manual code
 
 ## Commissioning
 
-1. Power the board: the LED blinks blue.
+1. Power the board: the red status LED blinks slowly.
 2. In the app, add a **Matter** device and scan the board's QR code (or type
    its manual code). Choose the home where the Thread Border Router is.
 3. Tuya-based apps (Tuya/Smart Life, Nova Digital) may ask for the Wi-Fi SSID
@@ -315,13 +315,13 @@ then uses the standard test data (QR code `MT:Y.K9042C00KA0648G00`, manual code
 4. With test certificates the app may warn that the device is **not
    certified**; if it offers to continue, accept. Apps that refuse uncertified
    devices cannot commission this firmware.
-5. The LED blinks purple while commissioning, then turns green once the device
-   is attached to the Thread network. The device shows up as a plug/outlet and
+5. The status LED blinks fast while commissioning, then stays on for 10 s once
+   the device is attached to the Thread network and turns off. The device shows up as a plug/outlet and
    the relay follows the app's on/off. The first commands right after adding it
    may not reach the device while it is still settling in the Thread network.
 
 Deleting the device in the app removes its fabric; with no fabric left the
-device factory resets and blinks blue again. The factory data (QR code,
+device factory resets and blinks slowly again. The factory data (QR code,
 certificate, names) is not affected by a factory reset, only by `erase-flash`.
 
 ### Home Assistant first, then Tuya (multi-admin)

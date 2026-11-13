@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 /*
- * Status LED: single-color programmable LED of the ESP32-C6-Relay_X1 (GPIO2).
+ * Status LED: red programmable LED of the ESP32-C6-Relay_X1 (GPIO2).
  * The relay has its own indicator LED on the board, so this LED only shows the
  * network status, with blink patterns instead of colors:
  *

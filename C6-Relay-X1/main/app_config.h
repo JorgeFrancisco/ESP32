@@ -6,7 +6,7 @@
 
 #pragma once
 
-/* Status LED: single-color programmable LED of the ESP32-C6-Relay_X1 (GPIO2, active high) */
+/* Status LED: red programmable LED of the ESP32-C6-Relay_X1 (GPIO2, active high) */
 #define STATUS_LED_GPIO                         2
 #define STATUS_LED_ACTIVE_LEVEL                 1
 #define STATUS_LED_STEP_MS                      100     /* blink pattern resolution */
