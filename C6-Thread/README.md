@@ -8,7 +8,7 @@ with a factory reset on the BOOT button and an RGB status LED. Commissioned over
 Bluetooth LE and controlled through a Thread Border Router (for example a
 Tuya/MOES "Matter & Thread" gateway).
 
-Port of [Example-ESP32-H2-Thread](https://github.com/JorgeFrancisco/Example-ESP32-H2-Thread)
+Port of [H2-Thread](../H2-Thread)
 to the ESP32-C6: same firmware and features, only the target, the flash
 configuration and the factory data change (see "Differences from the ESP32-H2
 version"). The ESP32-C6 Wi-Fi radio is not used; Thread runs on its IEEE
@@ -95,8 +95,10 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 #    [Environment]::SetEnvironmentVariable('IDF_COMPONENT_CACHE_PATH', 'C:\Espressif\cc', 'User')
 $env:IDF_COMPONENT_CACHE_PATH = 'C:\Espressif\cc'
 
-# 4. Go to the project folder
-cd C:\Users\jorge\WORKSPACE\ESP32\C6-Thread
+# 4. Clone the repository (only once) and go to the project folder.
+#    Keep the clone path short (see "Windows path length" below).
+git clone https://github.com/JorgeFrancisco/ESP32.git
+cd ESP32\C6-Thread
 
 # 5. Build (the target esp32c6 comes from sdkconfig.defaults).
 #    The first build downloads esp_matter and takes a while.
@@ -134,9 +136,10 @@ characters:
 - The default Component Manager cache (`%LOCALAPPDATA%\Espressif\ComponentManager\Cache`)
   exceeds the limit and the download fails with `FileNotFoundError` while
   extracting `esp_matter`. `IDF_COMPONENT_CACHE_PATH` moves it to a short folder.
-- In `managed_components`, the longest file reaches 257 characters with the
-  project in `C:\Users\jorge\WORKSPACE\ESP32\C6-Thread` (40 characters). The project path must be at
-  most 43 characters, or long paths must be enabled.
+- In `managed_components`, the longest file path below the project folder has
+  217 characters, so the project folder path must have at most 42 characters
+  (for example `C:\Projetos\ESP32\C6-Thread` has 27), or long paths must be
+  enabled.
 
 Enabling Windows long paths removes both limits (administrator PowerShell,
 then open a new terminal):
@@ -409,8 +412,8 @@ additions small.
 
 Measured on the ESP32-C6 N16 DevKitC (chip revision v0.2, 16 MB flash, 160 MHz)
 with ESP-IDF v5.5.5, esp-matter 1.6 and the `sdkconfig.defaults` of this
-repository (ELF SHA256 `a0cfb4e80...`). The ESP32-H2 column is the baseline of
-[Example-ESP32-H2-Thread](https://github.com/JorgeFrancisco/Example-ESP32-H2-Thread)
+project (ELF SHA256 `a0cfb4e80...`). The ESP32-H2 column is the baseline of
+[H2-Thread](../H2-Thread)
 (ESP32-H2-DevKitM-1, 4 MB flash, 96 MHz), same source code.
 
 ### Flash
@@ -525,7 +528,7 @@ left unallocated). `CONFIG_PARTITION_TABLE_OFFSET` stays `0xC000`.
 
 ## Differences from the ESP32-H2 version
 
-| Item                  | ESP32-C6 (this repository)                           | ESP32-H2                         |
+| Item                  | ESP32-C6 (this project)                              | ESP32-H2                         |
 | --------------------- | ---------------------------------------------------- | -------------------------------- |
 | Target                | `CONFIG_IDF_TARGET="esp32c6"`                        | `esp32h2`                        |
 | Flash                 | 16 MB (`CONFIG_ESPTOOLPY_FLASHSIZE_16MB`), Boya chip driver enabled | 4 MB             |

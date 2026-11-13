@@ -29,8 +29,8 @@ steps.
 
 The `esp_matter` package contains files with very long names. With Windows long
 paths disabled (the default, 260 characters), the Matter project folder must be
-at most 43 characters long (for example `C:\Users\jorge\WORKSPACE\ESP32\H2-Thread`
-has 40). See "Windows path length" in the H2-Thread or C6-Thread README.
+at most 42 characters long (for example `C:\Projetos\ESP32\H2-Thread` has
+27). See "Windows path length" in the H2-Thread or C6-Thread README.
 
 ## Factory data
 

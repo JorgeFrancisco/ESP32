@@ -58,8 +58,10 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 #    environment variables (IDF_PATH, PATH) remain available.
 . 'C:\Espressif\tools\Microsoft.v5.5.5.PowerShell_profile.ps1'
 
-# 3. Go to the project folder
-cd C:\Users\jorge\WORKSPACE\ESP32\H2-Zigbee
+# 3. Clone the repository (only once) and go to the project folder.
+#    Keep the clone path short (see "Windows path length" below).
+git clone https://github.com/JorgeFrancisco/ESP32.git
+cd ESP32\H2-Zigbee
 
 # 4. Only the first time (there is no build/ folder yet)
 idf.py set-target esp32h2

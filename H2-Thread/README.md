@@ -88,8 +88,10 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 #    [Environment]::SetEnvironmentVariable('IDF_COMPONENT_CACHE_PATH', 'C:\Espressif\cc', 'User')
 $env:IDF_COMPONENT_CACHE_PATH = 'C:\Espressif\cc'
 
-# 4. Go to the project folder
-cd C:\Users\jorge\WORKSPACE\ESP32\H2-Thread
+# 4. Clone the repository (only once) and go to the project folder.
+#    Keep the clone path short (see "Windows path length" below).
+git clone https://github.com/JorgeFrancisco/ESP32.git
+cd ESP32\H2-Thread
 
 # 5. Build (the target esp32h2 comes from sdkconfig.defaults).
 #    The first build downloads esp_matter and takes a while.
@@ -127,9 +129,10 @@ characters:
 - The default Component Manager cache (`%LOCALAPPDATA%\Espressif\ComponentManager\Cache`)
   exceeds the limit and the download fails with `FileNotFoundError` while
   extracting `esp_matter`. `IDF_COMPONENT_CACHE_PATH` moves it to a short folder.
-- In `managed_components`, the longest file reaches 257 characters with the
-  project in `C:\Users\jorge\WORKSPACE\ESP32\H2-Thread` (40 characters). The project path must be at
-  most 43 characters, or long paths must be enabled.
+- In `managed_components`, the longest file path below the project folder has
+  217 characters, so the project folder path must have at most 42 characters
+  (for example `C:\Projetos\ESP32\H2-Thread` has 27), or long paths must be
+  enabled.
 
 Enabling Windows long paths removes both limits (administrator PowerShell,
 then open a new terminal):
@@ -401,7 +404,7 @@ additions small.
 
 Baseline for comparing with other chips. Measured on the ESP32-H2-DevKitM-1
 (chip revision v0.1, 4 MB flash, 96 MHz) with ESP-IDF v5.5.5, esp-matter 1.6
-and the `sdkconfig.defaults` of this repository (ELF SHA256 `50e65306f...`).
+and the `sdkconfig.defaults` of this project (ELF SHA256 `50e65306f...`).
 
 ### Flash
 
