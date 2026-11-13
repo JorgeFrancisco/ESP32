@@ -59,7 +59,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 . 'C:\Espressif\tools\Microsoft.v5.5.5.PowerShell_profile.ps1'
 
 # 3. Go to the project folder
-cd C:\Projetos\ESP32\Example-ESP32-H2-Zigbee
+cd C:\Users\jorge\WORKSPACE\ESP32\H2-Zigbee
 
 # 4. Only the first time (there is no build/ folder yet)
 idf.py set-target esp32h2

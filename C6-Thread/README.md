@@ -96,7 +96,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 $env:IDF_COMPONENT_CACHE_PATH = 'C:\Espressif\cc'
 
 # 4. Go to the project folder
-cd C:\Projetos\ESP32\Example-ESP32-C6-Thread
+cd C:\Users\jorge\WORKSPACE\ESP32\C6-Thread
 
 # 5. Build (the target esp32c6 comes from sdkconfig.defaults).
 #    The first build downloads esp_matter and takes a while.
@@ -134,9 +134,9 @@ characters:
 - The default Component Manager cache (`%LOCALAPPDATA%\Espressif\ComponentManager\Cache`)
   exceeds the limit and the download fails with `FileNotFoundError` while
   extracting `esp_matter`. `IDF_COMPONENT_CACHE_PATH` moves it to a short folder.
-- In `managed_components`, the longest file reaches 258 characters with the
-  project in `C:\Projetos\ESP32\Example-ESP32-C6-Thread` (41 characters). A
-  longer project path breaks the build.
+- In `managed_components`, the longest file reaches 257 characters with the
+  project in `C:\Users\jorge\WORKSPACE\ESP32\C6-Thread` (40 characters). The project path must be at
+  most 43 characters, or long paths must be enabled.
 
 Enabling Windows long paths removes both limits (administrator PowerShell,
 then open a new terminal):

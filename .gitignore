@@ -1,0 +1,6 @@
+# Per-board factory data (private keys and pairing codes, never commit)
+*-factory-data/
+
+# Local editor/tool settings
+.vscode/
+.cache/
