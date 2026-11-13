@@ -187,8 +187,9 @@ and the QR code comes from the same generation as the data flashed to the board.
 Tested on the ESP32-C6-Relay_X1: after flashing the firmware and its own
 factory partition at `0x3E0000`, the board boots with the 4 MB table, reads the
 factory data (vendor/product IDs and discriminator) and starts Bluetooth LE
-advertising for commissioning. The same flow was commissioned in Home Assistant
-on C6-Thread (device attestation with the DAC of the factory partition).
+advertising. Commissioned in Home Assistant with its QR code (Companion app,
+Thread through the Home Assistant border router, next to the C6-Thread board):
+the relay follows the on/off from Home Assistant.
 
 > **Never commit the generated files.** They include the DAC private key and
 > the passcode verifier of the board. Keep them in private storage: they are
