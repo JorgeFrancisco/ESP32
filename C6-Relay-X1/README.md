@@ -35,7 +35,7 @@ Registry (no esp-matter clone or `ESP_MATTER_PATH` needed).
 ## Hardware
 
 Board: **ESP32-C6-Relay_X1** single relay development board (57.5 x 53.7 mm),
-with an **ESP32-C6-WROOM-1** module (ESP32-C6 QFN40 revision v0.2, **4 MB**
+with a DOIT **ESPC6-32 N4** module (ESP32-C6 QFN40 revision v0.2, **4 MB**
 flash), a 5 V **SRD-05VDC-SL-C** relay (NO/COM/NC, up to 10 A 250 VAC /
 30 VDC) with an indicator LED, a USB Type-C port and a 7-60 VDC input.
 
@@ -478,7 +478,7 @@ offsets. `CONFIG_PARTITION_TABLE_OFFSET` is `0xC000`.
 
 | Item              | C6-Relay-X1 (this project)                                  | C6-Thread                                       |
 | ----------------- | ----------------------------------------------------------- | ----------------------------------------------- |
-| Board             | ESP32-C6-Relay_X1 (ESP32-C6-WROOM-1), relay on the board    | ESP32-C6 N16 DevKitC, external relay module     |
+| Board             | ESP32-C6-Relay_X1 (DOIT ESPC6-32 N4), relay on the board    | ESP32-C6 N16 DevKitC, external relay module     |
 | Flash             | 4 MB (`CONFIG_ESPTOOLPY_FLASHSIZE_4MB`)                     | 16 MB, Boya chip driver enabled                 |
 | Partition table   | 4 MB: 1.875 MB OTA slots, 48 KB NVS, `fctry` at `0x3E0000`  | 16 MB: 4 MB OTA slots, 92 KB NVS, `fctry` at `0x2A000`, LittleFS `storage`, `coredump` |
 | Relay             | GPIO19, active high                                         | GPIO10, active high                             |
